@@ -1,0 +1,16 @@
+flowchart LR
+  A[Untrusted image file] --> B[Identity and bounded decode]
+  B --> C[Format plugins]
+  C --> D[Metadata]
+  C --> E[Structure and security]
+  C --> F[JPEG/compression]
+  B --> G[Format-independent pixel statistics]
+  D --> H[Evidence model]
+  E --> H
+  F --> H
+  G --> H
+  H --> I[Terminal]
+  H --> J[JSON]
+  H --> K[HTML]
+  H --> L[SARIF]
+  H --> M[Case metadata and hashes]

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imgforensics"
+version = "0.1.0"
+description = "Evidence-oriented, offline digital image forensics framework"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Manus AI"}]
+dependencies = [
+  "Pillow>=10.0",
+  "numpy>=1.24",
+  "typer>=0.12",
+  "rich>=13.0"
+]
+
+[project.optional-dependencies]
+analysis = ["opencv-python>=4.8", "scipy>=1.10", "imagehash>=4.3"]
+
+test = ["pytest>=8.0"]
+
+[project.scripts]
+imgforensics = "imgforensics.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]

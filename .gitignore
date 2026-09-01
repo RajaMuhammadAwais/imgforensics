@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.coverage
+.DS_Store
+case/
+reports/
+*.sqlite3
+*.db
+# Do not commit evidence or generated artifacts
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.tif
+*.tiff
+*.raw
