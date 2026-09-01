@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from enum import StrEnum
+from enum import Enum
 from typing import Any
 
-class Status(StrEnum):
+class Status(str, Enum):
     DETECTED = "DETECTED"
     NOT_DETECTED = "NOT DETECTED"
     POSSIBLE = "POSSIBLE"
@@ -14,7 +14,7 @@ class Status(StrEnum):
     EXPERIMENTAL = "EXPERIMENTAL"
     UNSUPPORTED = "UNSUPPORTED"
 
-class Severity(StrEnum):
+class Severity(str, Enum):
     INFO = "INFO"
     LOW = "LOW"
     MEDIUM = "MEDIUM"
