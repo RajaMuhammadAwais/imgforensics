@@ -13,7 +13,7 @@ imgforensics batch ./evidence --output ./case
 
 ## Current implementation
 
-The initial implementation provides a format-agnostic pipeline with bounded decoding, cryptographic hashes, extension/magic/decoder identity, EXIF and GPS presence checks, read-only embedded-signature scanning, JPEG quantization and controlled recompression measurements, descriptive pixel statistics, an explicitly experimental AI-indicator measurement, JSON/HTML/SARIF output, chain-of-custody metadata, and batch manifest generation. Unsupported or malformed inputs become structured findings rather than uncaught crashes.
+The initial foundation provides a format-agnostic pipeline with a serializable evidence graph and conservative provenance-marker analysis with bounded decoding, cryptographic hashes, extension/magic/decoder identity, EXIF and GPS presence checks, read-only embedded-signature scanning, JPEG quantization and controlled recompression measurements, descriptive pixel statistics, an explicitly experimental AI-indicator measurement, JSON/HTML/SARIF output, chain-of-custody metadata, and batch manifest generation. Unsupported or malformed inputs become structured findings rather than uncaught crashes.
 
 | Area | Behavior | Evidentiary caveat |
 |---|---|---|
@@ -24,6 +24,7 @@ The initial implementation provides a format-agnostic pipeline with bounded deco
 | JPEG | Quantization and recompression error | ELA and quality estimates are not standalone proof |
 | Pixels | Entropy, moments, channel correlation | Descriptive statistics require contextual comparison |
 | AI indicators | Experimental residual/color statistic | No definitive AI detection is claimed |
+| Provenance | C2PA/JUMBF candidate-marker scan and evidence graph | Marker presence is not signature or trust validation |
 
 ## Forensic stance
 
@@ -41,3 +42,5 @@ The tool reads files locally, performs no network requests, does not execute emb
 [2]: https://nij.ojp.gov/library/publications/method-detect-jpeg-based-double-compression “A Method to Detect JPEG-Based Double Compression”
 [3]: https://csrc.nist.gov/glossary/term/chain_of_custody “NIST chain of custody”
 [4]: https://www.nist.gov/forensic-science/interdisciplinary-topics/evidence-management “NIST Evidence Management”
+
+The expanded research basis is maintained in [`research/veritasforge-research-basis.md`](research/veritasforge-research-basis.md).
