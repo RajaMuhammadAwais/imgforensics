@@ -12,6 +12,7 @@ from typing import Callable
 from PIL import Image, UnidentifiedImageError
 
 from imgforensics.models import Finding, Report, Severity, Status
+from imgforensics.core.evidence_graph import EvidenceGraph
 
 MAGIC = {
     b"\xff\xd8\xff": ("JPEG", "image/jpeg"), b"\x89PNG\r\n\x1a\n": ("PNG", "image/png"),
@@ -80,4 +81,7 @@ def analyze(path: Path, analyzers: list[Analyzer], max_pixels: int = 50_000_000)
     started = time.time(); file_info, image, findings = identify(path, max_pixels); file_hashes = hashes(path)
     for analyzer in analyzers: findings.extend(analyzer.run(path, image))
     case = make_case(path, file_hashes, [a.name for a in analyzers], [], started)
-    return Report(file_info, file_hashes, findings, case)
+    graph = EvidenceGraph(); graph.add_node("asset", "asset", path.name, sha256=file_hashes["sha256"], format=file_info.get("format", "unknown"))
+    for index, finding in enumerate(findings):
+        evidence_id = f"finding-{index+1}"; graph.add_node(evidence_id, "finding", finding.finding, category=finding.category, status=finding.status.value, confidence=finding.confidence); graph.add_edge("asset", evidence_id, "supports", [evidence_id])
+    return Report(file_info, file_hashes, findings, case, evidence_graph=graph.to_dict())

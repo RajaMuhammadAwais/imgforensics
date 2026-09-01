@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from enum import StrEnum
+from enum import Enum
 from typing import Any
 
-class Status(StrEnum):
+class Status(str, Enum):
     DETECTED = "DETECTED"
     NOT_DETECTED = "NOT DETECTED"
     POSSIBLE = "POSSIBLE"
@@ -14,7 +14,7 @@ class Status(StrEnum):
     EXPERIMENTAL = "EXPERIMENTAL"
     UNSUPPORTED = "UNSUPPORTED"
 
-class Severity(StrEnum):
+class Severity(str, Enum):
     INFO = "INFO"
     LOW = "LOW"
     MEDIUM = "MEDIUM"
@@ -48,8 +48,9 @@ class Report:
     findings: list[Finding]
     case: dict[str, Any]
     artifacts: list[str] = field(default_factory=list)
+    evidence_graph: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {"file": self.file, "hashes": self.hashes,
                 "findings": [f.to_dict() for f in self.findings],
-                "case": self.case, "artifacts": self.artifacts}
+                "case": self.case, "artifacts": self.artifacts, "evidence_graph": self.evidence_graph}
