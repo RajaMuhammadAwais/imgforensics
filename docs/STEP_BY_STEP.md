@@ -29,6 +29,12 @@ python -m pytest -q
 
 The current repository test suite passes with `3 passed`. In each new shell, activate the environment again with `source .venv/bin/activate`.
 
+Check the installed CLI version:
+
+```bash
+imgforensics --version
+```
+
 ## 2. Preserve the evidence
 
 Do not edit, resize, recompress, or clean metadata from the original. Use a working copy:
@@ -44,6 +50,22 @@ sha256sum -c case-001/original/photo.jpg.sha256
 `OK` means that the working copy has the same bytes as the recorded original. A hash establishes byte identity/fixity; it does not establish authorship or authenticity [3].
 
 ## 3. Analyze one image
+
+### Easiest command
+
+For a beginner-friendly scan, run:
+
+```bash
+imgforensics scan photo.jpg
+```
+
+This runs all built-in checks and creates `case/photo/` with `report.json`, `report.html`, and `case.json`, while also printing a short terminal summary. Choose another output folder with `-o`:
+
+```bash
+imgforensics scan photo.jpg -o my-report --analyst "Analyst Name" --case-id case-001
+```
+
+Use `imgforensics scan --help` to see only the easy-mode options.
 
 ```bash
 imgforensics image case-001/working/photo.jpg

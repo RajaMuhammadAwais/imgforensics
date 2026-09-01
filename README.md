@@ -11,6 +11,8 @@ imgforensics image sample.jpg --all --json report.json --html report.html --sari
 imgforensics batch ./evidence --output ./case
 ```
 
+For the simplest workflow, use `imgforensics scan photo.jpg`. It runs all checks and saves `report.json`, `report.html`, and `case.json` under `case/photo/`. Use `-o my-report` to choose another output folder.
+
 Ubuntu installation, evidence-preservation workflow, all flags, batch usage, report verification, and research-backed limitations are documented in [`docs/STEP_BY_STEP.md`](docs/STEP_BY_STEP.md).
 
 Useful flags include `--metadata`, `--structure`, `--compression`, `--pixel`, `--ai`, `--provenance`, `--max-pixels`, `--analyst`, `--case-id`, `--no-terminal`, and `--strict`. Use `--all` (or `--deep`) for the complete built-in analysis.
