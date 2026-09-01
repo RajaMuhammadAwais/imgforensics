@@ -11,6 +11,10 @@ imgforensics image sample.jpg --all --json report.json --html report.html --sari
 imgforensics batch ./evidence --output ./case
 ```
 
+Ubuntu installation, evidence-preservation workflow, all flags, batch usage, report verification, and research-backed limitations are documented in [`docs/STEP_BY_STEP.md`](docs/STEP_BY_STEP.md).
+
+Useful flags include `--metadata`, `--structure`, `--compression`, `--pixel`, `--ai`, `--provenance`, `--max-pixels`, `--analyst`, `--case-id`, `--no-terminal`, and `--strict`. Use `--all` (or `--deep`) for the complete built-in analysis.
+
 ## Current implementation
 
 The initial foundation provides a format-agnostic pipeline with a serializable evidence graph and conservative provenance-marker analysis with bounded decoding, cryptographic hashes, extension/magic/decoder identity, EXIF and GPS presence checks, read-only embedded-signature scanning, JPEG quantization and controlled recompression measurements, descriptive pixel statistics, an explicitly experimental AI-indicator measurement, JSON/HTML/SARIF output, chain-of-custody metadata, and batch manifest generation. Unsupported or malformed inputs become structured findings rather than uncaught crashes.

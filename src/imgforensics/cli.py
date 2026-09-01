@@ -10,7 +10,7 @@ from imgforensics.reports.render import terminal, to_json, to_html, to_sarif
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 def selected(all_modules: bool, metadata_on: bool, structure_on: bool, compression_on: bool, pixel_on: bool, ai_on: bool, provenance_on: bool = False) -> list[Analyzer]:
-    if all_modules or not any((metadata_on, structure_on, compression_on, pixel_on, ai_on)):
+    if all_modules or not any((metadata_on, structure_on, compression_on, pixel_on, ai_on, provenance_on)):
         return [Analyzer("metadata", "metadata", metadata), Analyzer("structure", "security", structure), Analyzer("compression", "compression", jpeg), Analyzer("pixel", "pixel", pixels), Analyzer("ai", "ai", ai_indicators), Analyzer("provenance", "provenance", c2pa)]
     result = []
     if metadata_on: result.append(Analyzer("metadata", "metadata", metadata))
@@ -22,19 +22,25 @@ def selected(all_modules: bool, metadata_on: bool, structure_on: bool, compressi
     return result
 
 @app.command()
-def image(path: Path = typer.Argument(..., exists=True, readable=True), deep: bool = typer.Option(False), all_modules: bool = typer.Option(False, "--all"), metadata_on: bool = typer.Option(False, "--metadata"), structure_on: bool = typer.Option(False, "--structure"), compression_on: bool = typer.Option(False, "--compression"), pixel_on: bool = typer.Option(False, "--pixel"), ai_on: bool = typer.Option(False, "--ai"), provenance_on: bool = typer.Option(False, "--provenance"), json_path: Path | None = typer.Option(None, "--json"), html_path: Path | None = typer.Option(None, "--html"), sarif_path: Path | None = typer.Option(None, "--sarif"), output: Path | None = typer.Option(None, "--output"), max_pixels: int = typer.Option(50_000_000, min=1)):
+def image(path: Path = typer.Argument(..., exists=True, readable=True), deep: bool = typer.Option(False, "--deep", help="Alias for --all."), all_modules: bool = typer.Option(False, "--all", help="Run every built-in analyzer."), metadata_on: bool = typer.Option(False, "--metadata", help="Run metadata and GPS-presence checks."), structure_on: bool = typer.Option(False, "--structure", help="Run read-only embedded-signature checks."), compression_on: bool = typer.Option(False, "--compression", help="Run JPEG quantization/recompression checks."), pixel_on: bool = typer.Option(False, "--pixel", help="Run descriptive pixel statistics."), ai_on: bool = typer.Option(False, "--ai", help="Run explicitly experimental AI-indicator statistic."), provenance_on: bool = typer.Option(False, "--provenance", help="Scan for candidate C2PA/JUMBF markers only."), json_path: Path | None = typer.Option(None, "--json", help="Write a JSON report."), html_path: Path | None = typer.Option(None, "--html", help="Write a self-contained HTML report."), sarif_path: Path | None = typer.Option(None, "--sarif", help="Write SARIF 2.1.0 findings."), output: Path | None = typer.Option(None, "--output", help="Create a case directory and default report files."), max_pixels: int = typer.Option(50_000_000, "--max-pixels", min=1, help="Bound decoded pixels to protect memory."), analyst: str = typer.Option("unspecified", "--analyst", help="Analyst label stored in case metadata."), case_id: str | None = typer.Option(None, "--case-id", help="Optional case identifier stored in case metadata."), no_terminal: bool = typer.Option(False, "--no-terminal", help="Suppress terminal output."), strict: bool = typer.Option(False, "--strict", help="Exit 2 if any HIGH or MEDIUM finding is present.")):
     if not path.is_file(): raise typer.BadParameter("path must be a regular file")
     report = analyze(path, selected(all_modules or deep, metadata_on, structure_on, compression_on, pixel_on, ai_on, provenance_on), max_pixels)
+    report.case["analyst"] = analyst
+    if case_id:
+        report.case["case_id"] = case_id
     if output:
         output.mkdir(parents=True, exist_ok=True); json_path = json_path or output / "report.json"; html_path = html_path or output / "report.html"; (output / "case.json").write_text(json.dumps(report.case, indent=2) + "\n")
     if json_path: to_json(report, json_path)
     if html_path: to_html(report, html_path)
     if sarif_path: to_sarif(report, sarif_path)
-    typer.echo(terminal(report))
+    if not no_terminal:
+        typer.echo(terminal(report))
+    if strict and any(f.severity.value in {"HIGH", "MEDIUM"} for f in report.findings):
+        raise typer.Exit(code=2)
 
 @app.command("analyze")
-def analyze_command(path: Path = typer.Argument(..., exists=True, readable=True), deep: bool = typer.Option(False), all_modules: bool = typer.Option(False, "--all"), metadata_on: bool = typer.Option(False, "--metadata"), structure_on: bool = typer.Option(False, "--structure"), compression_on: bool = typer.Option(False, "--compression"), pixel_on: bool = typer.Option(False, "--pixel"), ai_on: bool = typer.Option(False, "--ai"), provenance_on: bool = typer.Option(False, "--provenance"), json_path: Path | None = typer.Option(None, "--json"), html_path: Path | None = typer.Option(None, "--html"), sarif_path: Path | None = typer.Option(None, "--sarif"), output: Path | None = typer.Option(None, "--output"), max_pixels: int = typer.Option(50_000_000, min=1)):
-    return image(path, deep, all_modules, metadata_on, structure_on, compression_on, pixel_on, ai_on, provenance_on, json_path, html_path, sarif_path, output, max_pixels)
+def analyze_command(path: Path = typer.Argument(..., exists=True, readable=True), deep: bool = typer.Option(False, "--deep"), all_modules: bool = typer.Option(False, "--all"), metadata_on: bool = typer.Option(False, "--metadata"), structure_on: bool = typer.Option(False, "--structure"), compression_on: bool = typer.Option(False, "--compression"), pixel_on: bool = typer.Option(False, "--pixel"), ai_on: bool = typer.Option(False, "--ai"), provenance_on: bool = typer.Option(False, "--provenance"), json_path: Path | None = typer.Option(None, "--json"), html_path: Path | None = typer.Option(None, "--html"), sarif_path: Path | None = typer.Option(None, "--sarif"), output: Path | None = typer.Option(None, "--output"), max_pixels: int = typer.Option(50_000_000, "--max-pixels", min=1), analyst: str = typer.Option("unspecified", "--analyst"), case_id: str | None = typer.Option(None, "--case-id"), no_terminal: bool = typer.Option(False, "--no-terminal"), strict: bool = typer.Option(False, "--strict")):
+    return image(path, deep, all_modules, metadata_on, structure_on, compression_on, pixel_on, ai_on, provenance_on, json_path, html_path, sarif_path, output, max_pixels, analyst, case_id, no_terminal, strict)
 
 @app.command()
 def batch(directory: Path = typer.Argument(..., exists=True, file_okay=False), output: Path = typer.Option(Path("case"), "--output")):

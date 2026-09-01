@@ -6,7 +6,7 @@ __pycache__/
 .coverage
 .DS_Store
 case/
-reports/
+/reports/
 *.sqlite3
 *.db
 # Do not commit evidence or generated artifacts
